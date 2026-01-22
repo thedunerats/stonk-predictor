@@ -1,0 +1,83 @@
+.metrics-display {
+  margin: 2rem 0;
+}
+
+.metrics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.metrics-column {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 5px solid #1e3c72;
+}
+
+.metrics-column h3 {
+  color: #1e3c72;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.metric-item:last-child {
+  border-bottom: none;
+}
+
+.metric-name {
+  font-weight: 600;
+  color: #555;
+}
+
+.metric-number {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1e3c72;
+}
+
+.accuracy-status {
+  padding: 1.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.status-excellent {
+  background: #d4edda;
+  border-left: 5px solid #28a745;
+  color: #155724;
+}
+
+.status-good {
+  background: #d1ecf1;
+  border-left: 5px solid #17a2b8;
+  color: #0c5460;
+}
+
+.status-fair {
+  background: #fff3cd;
+  border-left: 5px solid #ffc107;
+  color: #856404;
+}
+
+.status-poor {
+  background: #f8d7da;
+  border-left: 5px solid #dc3545;
+  color: #721c24;
+}
+
+@media (max-width: 768px) {
+  .metrics-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
