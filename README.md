@@ -134,15 +134,15 @@ stonk-predictor/
 │   │   │   └── PredictionResults.tsx
 │   │   ├── types/
 │   │   │   └── index.ts        # TypeScript type definitions
+│   │   ├── __tests__/          # Unit tests
+│   │   │   ├── App.test.tsx
+│   │   │   ├── ConfigPanel.test.tsx
+│   │   │   ├── MetricsDisplay.test.tsx
+│   │   │   ├── StockChart.test.tsx
+│   │   │   └── PredictionResults.test.tsx
 │   │   ├── App.tsx
 │   │   ├── App.css
 │   │   └── index.tsx
-│   ├── test/                   # Unit tests
-│   │   ├── App.test.tsx
-│   │   ├── ConfigPanel.test.tsx
-│   │   ├── MetricsDisplay.test.tsx
-│   │   ├── StockChart.test.tsx
-│   │   └── PredictionResults.test.tsx
 │   ├── Dockerfile              # Production Docker build
 │   ├── Dockerfile.dev          # Development Docker build
 │   ├── nginx.conf              # Nginx configuration
