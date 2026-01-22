@@ -1,10 +1,12 @@
-import unittest
-from unittest.mock import patch, MagicMock
+import pytest
+from unittest.mock import MagicMock
 import sys
 import os
 import numpy as np
 import pandas as pd
+import requests
 from datetime import datetime, timedelta
+from sklearn.preprocessing import MinMaxScaler
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -19,79 +21,154 @@ from helpers import (
 )
 
 
-class TestFlaskApp(unittest.TestCase):
+# Pytest Fixtures
+@pytest.fixture
+def client():
+    """Create test client for Flask app"""
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
+
+
+@pytest.fixture
+def mock_stock_dataframe():
+    """Create mock stock data DataFrame"""
+    return pd.DataFrame({
+        'Open': [100, 101, 102],
+        'High': [105, 106, 107],
+        'Low': [95, 96, 97],
+        'Close': [100, 101, 102],
+        'Volume': [1000000, 1100000, 1200000]
+    }, index=pd.date_range('2020-01-01', periods=3))
+
+
+@pytest.fixture
+def mock_large_dataframe():
+    """Create larger mock DataFrame for prediction tests"""
+    return pd.DataFrame({
+        'Close': np.random.rand(100) * 100 + 100
+    }, index=pd.date_range('2020-01-01', periods=100))
+
+
+@pytest.fixture
+def mock_download_stock_data(mocker, mock_stock_dataframe):
+    """Mock download_stock_data function"""
+    mock = mocker.patch('app.download_stock_data')
+    mock.return_value = (mock_stock_dataframe, 'AAPL')
+    return mock
+
+
+@pytest.fixture
+def mock_lstm_model(mocker):
+    """Mock LSTM model"""
+    mock_model = MagicMock()
+    mock_model.fit.return_value.history = {
+        'loss': [0.1, 0.05, 0.01],
+        'val_loss': [0.12, 0.06, 0.02]
+    }
+    mock_model.predict.return_value = np.random.rand(10, 1) * 100 + 100
+    
+    mock = mocker.patch('app.build_lstm_model')
+    mock.return_value = mock_model
+    return mock
+
+
+@pytest.fixture
+def mock_api_response(mocker):
+    """Mock successful API response"""
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        'symbol': 'AAPL',
+        'historical': [
+            {
+                'date': '2020-01-01',
+                'open': 100,
+                'high': 105,
+                'low': 95,
+                'close': 100,
+                'volume': 1000000
+            },
+            {
+                'date': '2020-01-02',
+                'open': 101,
+                'high': 106,
+                'low': 96,
+                'close': 101,
+                'volume': 1100000
+            }
+        ]
+    }
+    
+    mock = mocker.patch('requests.get')
+    mock.return_value = mock_response
+    return mock
+
+
+@pytest.fixture
+def mock_failed_api_response(mocker):
+    """Mock failed API response"""
+    mock_response = MagicMock()
+    mock_response.status_code = 404
+    
+    mock = mocker.patch('requests.get')
+    mock.return_value = mock_response
+    return mock
+
+
+# Test Flask Endpoints
+class TestFlaskApp:
     """Test Flask application endpoints"""
 
-    def setUp(self):
-        """Set up test client"""
-        self.app = app
-        self.app.config['TESTING'] = True
-        self.client = self.app.test_client()
-
-    def test_health_check(self):
+    def test_health_check(self, client):
         """Test health check endpoint"""
-        response = self.client.get('/api/health')
-        self.assertEqual(response.status_code, 200)
+        response = client.get('/api/health')
+        assert response.status_code == 200
         data = response.get_json()
-        self.assertEqual(data['status'], 'ok')
-        self.assertIn('message', data)
+        assert data['status'] == 'ok'
+        assert 'message' in data
 
-    @patch('helpers.download_stock_data')
-    def test_stock_data_endpoint_success(self, mock_download):
+    def test_stock_data_endpoint_success(self, client, mock_download_stock_data):
         """Test successful stock data retrieval"""
-        # Mock data
-        mock_df = pd.DataFrame({
-            'Open': [100, 101, 102],
-            'High': [105, 106, 107],
-            'Low': [95, 96, 97],
-            'Close': [100, 101, 102],
-            'Volume': [1000000, 1100000, 1200000]
-        }, index=pd.date_range('2020-01-01', periods=3))
-        
-        mock_download.return_value = (mock_df, 'AAPL')
-
-        response = self.client.post('/api/stock/data', json={
+        response = client.post('/api/stock/data', json={
             'ticker': 'AAPL',
             'startDate': '2020-01-01',
             'endDate': '2020-01-03',
             'apiKey': ''
         })
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.get_json()
-        self.assertEqual(data['ticker'], 'AAPL')
-        self.assertEqual(len(data['historicalData']), 3)
-        self.assertIn('currentPrice', data)
+        assert data['ticker'] == 'AAPL'
+        assert len(data['historicalData']) == 3
+        assert 'currentPrice' in data
 
-    def test_stock_data_endpoint_missing_params(self):
+    def test_stock_data_endpoint_missing_params(self, client):
         """Test stock data endpoint with missing parameters"""
-        response = self.client.post('/api/stock/data', json={
+        response = client.post('/api/stock/data', json={
             'ticker': 'AAPL'
             # Missing dates
         })
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
-    @patch('helpers.download_stock_data')
-    @patch('helpers.build_lstm_model')
-    def test_predict_endpoint_success(self, mock_model, mock_download):
+    def test_predict_endpoint_success(self, client, mocker, mock_large_dataframe):
         """Test successful prediction endpoint"""
-        # Mock data
-        mock_df = pd.DataFrame({
-            'Close': np.random.rand(100) * 100 + 100
-        }, index=pd.date_range('2020-01-01', periods=100))
+        # Mock download function
+        mock_download = mocker.patch('app.download_stock_data')
+        mock_download.return_value = (mock_large_dataframe, 'AAPL')
         
-        mock_download.return_value = (mock_df, 'AAPL')
-        
-        # Mock model
-        mock_model_instance = MagicMock()
-        mock_model_instance.fit.return_value.history = {
+        # Mock LSTM model
+        mock_model = MagicMock()
+        mock_model.fit.return_value.history = {
             'loss': [0.1, 0.05, 0.01],
             'val_loss': [0.12, 0.06, 0.02]
         }
-        mock_model_instance.predict.return_value = np.random.rand(10, 1) * 100 + 100
-        mock_model.return_value = mock_model_instance
+        mock_model.predict.return_value = np.random.rand(10, 1) * 100 + 100
+        
+        mock_build_model = mocker.patch('app.build_lstm_model')
+        mock_build_model.return_value = mock_model
 
-        response = self.client.post('/api/predict', json={
+        response = client.post('/api/predict', json={
             'ticker': 'AAPL',
             'startDate': '2020-01-01',
             'endDate': '2020-04-10',
@@ -105,12 +182,12 @@ class TestFlaskApp(unittest.TestCase):
         # Note: This might fail due to data size, but tests the structure
         if response.status_code == 200:
             data = response.get_json()
-            self.assertIn('trainMetrics', data)
-            self.assertIn('testMetrics', data)
-            self.assertIn('futureData', data)
+            assert 'trainMetrics' in data
+            assert 'testMetrics' in data
+            assert 'futureData' in data
 
 
-class TestDataFunctions(unittest.TestCase):
+class TestDataFunctions:
     """Test data processing functions"""
 
     def test_prepare_data_valid(self):
@@ -124,11 +201,11 @@ class TestDataFunctions(unittest.TestCase):
         X_train, X_test, y_train, y_test, scaler, scaled_data = prepare_data(df, sequence_length)
         
         # Assertions
-        self.assertEqual(X_train.shape[1], sequence_length)
-        self.assertEqual(X_train.shape[2], 1)
-        self.assertEqual(len(y_train), len(X_train))
-        self.assertGreater(len(X_train), 0)
-        self.assertGreater(len(X_test), 0)
+        assert X_train.shape[1] == sequence_length
+        assert X_train.shape[2] == 1
+        assert len(y_train) == len(X_train)
+        assert len(X_train) > 0
+        assert len(X_test) > 0
 
     def test_prepare_data_insufficient_data(self):
         """Test data preparation with insufficient data"""
@@ -136,7 +213,7 @@ class TestDataFunctions(unittest.TestCase):
             'Close': [100, 101, 102]
         })
         
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             prepare_data(df, sequence_length=60)
 
     def test_calculate_metrics(self):
@@ -146,16 +223,16 @@ class TestDataFunctions(unittest.TestCase):
         
         metrics = calculate_metrics(actual, predicted)
         
-        self.assertIn('MSE', metrics)
-        self.assertIn('RMSE', metrics)
-        self.assertIn('MAE', metrics)
-        self.assertIn('MAPE', metrics)
-        self.assertGreater(metrics['MSE'], 0)
-        self.assertGreater(metrics['MAPE'], 0)
-        self.assertLess(metrics['MAPE'], 100)  # Should be reasonable percentage
+        assert 'MSE' in metrics
+        assert 'RMSE' in metrics
+        assert 'MAE' in metrics
+        assert 'MAPE' in metrics
+        assert metrics['MSE'] > 0
+        assert metrics['MAPE'] > 0
+        assert metrics['MAPE'] < 100  # Should be reasonable percentage
 
 
-class TestLSTMModel(unittest.TestCase):
+class TestLSTMModel:
     """Test LSTM model building"""
 
     def test_build_lstm_model(self):
@@ -164,22 +241,20 @@ class TestLSTMModel(unittest.TestCase):
         model = build_lstm_model(sequence_length)
         
         # Check model structure
-        self.assertIsNotNone(model)
-        self.assertEqual(len(model.layers), 6)  # 2 LSTM + 2 Dropout + 2 Dense
+        assert model is not None
+        assert len(model.layers) == 6  # 2 LSTM + 2 Dropout + 2 Dense
         
         # Check input shape
-        self.assertEqual(model.input_shape, (None, sequence_length, 1))
+        assert model.input_shape == (None, sequence_length, 1)
         
         # Check output shape
-        self.assertEqual(model.output_shape, (None, 1))
+        assert model.output_shape == (None, 1)
         
         # Check model is compiled
-        self.assertIsNotNone(model.optimizer)
+        assert model.optimizer is not None
 
     def test_predict_future_prices(self):
         """Test future price prediction"""
-        from sklearn.preprocessing import MinMaxScaler
-        
         # Create mock model
         model = build_lstm_model(60)
         
@@ -192,67 +267,30 @@ class TestLSTMModel(unittest.TestCase):
         predictions = predict_future_prices(model, last_sequence, scaler, days)
         
         # Assertions
-        self.assertEqual(len(predictions), days)
-        self.assertTrue(all(predictions > 0))  # Stock prices should be positive
+        assert len(predictions) == days
+        assert all(predictions > 0)  # Stock prices should be positive
 
 
-class TestStockDataDownload(unittest.TestCase):
+class TestStockDataDownload:
     """Test stock data download function"""
 
-    @patch('helpers.requests.get')
-    def test_download_stock_data_success(self, mock_get):
+    def test_download_stock_data_success(self, mock_api_response):
         """Test successful stock data download"""
-        # Mock API response
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            'symbol': 'AAPL',
-            'historical': [
-                {
-                    'date': '2020-01-01',
-                    'open': 100,
-                    'high': 105,
-                    'low': 95,
-                    'close': 100,
-                    'volume': 1000000
-                },
-                {
-                    'date': '2020-01-02',
-                    'open': 101,
-                    'high': 106,
-                    'low': 96,
-                    'close': 101,
-                    'volume': 1100000
-                }
-            ]
-        }
-        mock_get.return_value = mock_response
-
         start_date = datetime(2020, 1, 1)
         end_date = datetime(2020, 1, 2)
         
         df, company_name = download_stock_data('AAPL', start_date, end_date, 'test_key')
         
         # Assertions
-        self.assertIsNotNone(df)
-        self.assertEqual(company_name, 'AAPL')
-        self.assertEqual(len(df), 2)
-        self.assertIn('Close', df.columns)
+        assert df is not None
+        assert company_name == 'AAPL'
+        assert len(df) == 2
+        assert 'Close' in df.columns
 
-    @patch('helpers.requests.get')
-    def test_download_stock_data_api_failure(self, mock_get):
+    def test_download_stock_data_api_failure(self, mock_failed_api_response):
         """Test stock data download with API failure"""
-        # Mock failed API response
-        mock_response = MagicMock()
-        mock_response.status_code = 404
-        mock_get.return_value = mock_response
-
         start_date = datetime(2020, 1, 1)
         end_date = datetime(2020, 1, 2)
         
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             download_stock_data('INVALID', start_date, end_date)
-
-
-if __name__ == '__main__':
-    unittest.main()
