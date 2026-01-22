@@ -15,13 +15,13 @@ Complete guide for running the Stock Predictor application using Docker.
 
 ```bash
 # Build and start all services
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop services
-docker-compose down
+docker compose down
 ```
 
 The application will be available at:
@@ -32,10 +32,10 @@ The application will be available at:
 
 ```bash
 # Build and start development environment
-docker-compose -f docker-compose.dev.yml up
+docker compose -f docker-compose.dev.yml up
 
 # Rebuild after dependency changes
-docker-compose -f docker-compose.dev.yml up --build
+docker compose -f docker-compose.dev.yml up --build
 ```
 
 Development URLs:
@@ -70,66 +70,66 @@ Development URLs:
 
 ```bash
 # Build all images
-docker-compose build
+docker compose build
 
 # Build specific service
-docker-compose build backend
-docker-compose build frontend
+docker compose build backend
+docker compose build frontend
 
-# Build without cache
-docker-compose build --no-cache
+# Force rebuild (no cache)
+docker compose build --no-cache
 ```
 
 ### Managing Containers
 
 ```bash
 # Start in background
-docker-compose up -d
+docker compose up -d
 
 # Start specific service
-docker-compose up -d backend
+docker compose up -d backend
 
 # View running containers
-docker-compose ps
+docker compose ps
 
 # Stop all containers
-docker-compose stop
+docker compose stop
 
 # Stop and remove containers
-docker-compose down
+docker compose down
 
 # Remove containers and volumes
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Viewing Logs
 
 ```bash
 # All services
-docker-compose logs -f
+docker compose logs -f
 
 # Specific service
-docker-compose logs -f backend
-docker-compose logs -f frontend
+docker compose logs -f backend
+docker compose logs -f frontend
 
 # Last 100 lines
-docker-compose logs --tail=100
+docker compose logs --tail=100
 ```
 
 ### Executing Commands
 
 ```bash
 # Backend shell
-docker-compose exec backend /bin/bash
+docker compose exec backend /bin/bash
 
 # Run Python commands
-docker-compose exec backend python -c "import tensorflow; print(tensorflow.__version__)"
+docker compose exec backend python -c "import tensorflow; print(tensorflow.__version__)"
 
 # Frontend shell
-docker-compose exec frontend /bin/sh
+docker compose exec frontend /bin/sh
 
 # Run npm commands (dev only)
-docker-compose exec frontend npm test
+docker compose exec frontend npm test
 ```
 
 ## Testing in Docker
@@ -138,26 +138,26 @@ docker-compose exec frontend npm test
 
 ```bash
 # Install test dependencies
-docker-compose exec backend pip install -r test/requirements-test.txt
+docker compose exec backend pip install -r test/requirements-test.txt
 
 # Run all tests
-docker-compose exec backend pytest test/ -v
+docker compose exec backend pytest test/ -v
 
 # Run with coverage
-docker-compose exec backend pytest test/ --cov=. --cov-report=html
+docker compose exec backend pytest test/ --cov=. --cov-report=html
 
 # Run specific test file
-docker-compose exec backend pytest test/test_app.py -v
+docker compose exec backend pytest test/test_app.py -v
 ```
 
 ### Run Frontend Tests
 
 ```bash
 # Run all tests (development mode)
-docker-compose -f docker-compose.dev.yml exec frontend npm test
+docker compose -f docker-compose.dev.yml exec frontend npm test
 
 # Run with coverage
-docker-compose -f docker-compose.dev.yml exec frontend npm test -- --coverage --watchAll=false
+docker compose -f docker-compose.dev.yml exec frontend npm test -- --coverage --watchAll=false
 ```
 
 ## Environment Configuration
@@ -220,7 +220,7 @@ Both services include health checks:
 
 ```bash
 # Check container health
-docker-compose ps
+docker compose ps
 
 # Backend health endpoint
 curl http://localhost:5000/api/health
@@ -240,16 +240,16 @@ Health check details:
 
 ```bash
 # View logs
-docker-compose logs backend
-docker-compose logs frontend
+docker compose logs backend
+docker compose logs frontend
 
 # Check resource usage
 docker stats
 
 # Rebuild from scratch
-docker-compose down -v
-docker-compose build --no-cache
-docker-compose up
+docker compose down -v
+docker compose build --no-cache
+docker compose up
 ```
 
 ### Port Already in Use
@@ -279,7 +279,7 @@ Increase Docker Desktop memory allocation:
 sudo chown -R $USER:$USER ./server ./client
 
 # Or run with sudo
-sudo docker-compose up
+sudo docker compose up
 ```
 
 ### Backend Can't Install TensorFlow
@@ -296,10 +296,10 @@ FROM tensorflow/tensorflow:2.20.0-py3
 
 ```bash
 # Clear npm cache
-docker-compose exec frontend npm cache clean --force
+docker compose exec frontend npm cache clean --force
 
 # Rebuild dependencies
-docker-compose build --no-cache frontend
+docker compose build --no-cache frontend
 ```
 
 ## Performance Optimization
@@ -324,7 +324,7 @@ RUN apt-get purge -y gcc g++ && apt-get autoremove -y
 
 ```bash
 # Use BuildKit for parallel builds
-DOCKER_BUILDKIT=1 docker-compose build
+DOCKER_BUILDKIT=1 docker compose build
 
 # Cache dependencies separately
 # (Already implemented in Dockerfiles)
@@ -368,7 +368,7 @@ USER appuser
 
 ```bash
 # Scale backend instances
-docker-compose up -d --scale backend=3
+docker compose up -d --scale backend=3
 
 # Add load balancer (nginx, HAProxy)
 ```
@@ -377,7 +377,7 @@ docker-compose up -d --scale backend=3
 
 ```bash
 # Install Prometheus + Grafana
-docker-compose -f docker-compose.monitoring.yml up
+docker compose -f docker-compose.monitoring.yml up
 
 # View metrics
 http://localhost:9090  # Prometheus
@@ -399,12 +399,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build images
-        run: docker-compose build
+        run: docker compose build
       - name: Run tests
         run: |
-          docker-compose up -d
-          docker-compose exec backend pytest
-          docker-compose exec frontend npm test
+          docker compose up -d
+          docker compose exec backend pytest
+          docker compose exec frontend npm test
 ```
 
 ### Docker Hub Deployment
@@ -429,7 +429,7 @@ docker push yourusername/stonk-frontend:latest
 ## Support
 
 For issues or questions:
-1. Check logs: `docker-compose logs -f`
-2. Verify health: `docker-compose ps`
+1. Check logs: `docker compose logs -f`
+2. Verify health: `docker compose ps`
 3. Review [TECHNICAL_README.md](TECHNICAL_README.md) for architecture details
 4. Check [QUICKSTART.md](QUICKSTART.md) for basic setup

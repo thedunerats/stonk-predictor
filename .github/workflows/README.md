@@ -24,7 +24,7 @@ Runs comprehensive unit tests for both backend and frontend:
 Validates Docker builds:
 - Builds backend Docker image
 - Builds frontend Docker image
-- Validates docker-compose configuration
+- Validates Docker Compose configuration
 - Uses BuildKit caching for faster builds
 
 ### 🔍 lint.yml - Code Quality
@@ -54,10 +54,10 @@ npm test -- --coverage --watchAll=false
 
 ### Test Docker Build
 ```bash
-docker-compose build
-docker-compose up -d
-docker-compose exec backend pytest test/ -v
-docker-compose exec frontend npm test
+docker compose build
+docker compose up -d
+docker compose exec backend pytest test/ -v
+docker compose exec frontend npm test
 ```
 
 ## Workflow Status

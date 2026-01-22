@@ -35,7 +35,7 @@
 - [ ] Manual testing completed
 
 ### Integration Testing
-- [ ] Tested locally with `docker-compose up`
+- [ ] Tested locally with `docker compose up`
 - [ ] Verified API endpoints work correctly
 - [ ] Tested UI functionality in browser
 

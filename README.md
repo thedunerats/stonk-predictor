@@ -34,10 +34,10 @@ A full-stack web application that uses LSTM (Long Short-Term Memory) neural netw
 
 ```bash
 # Production build
-docker-compose up -d
+docker compose up -d
 
 # Development build (with hot-reload)
-docker-compose -f docker-compose.dev.yml up
+docker compose -f docker-compose.dev.yml up
 ```
 
 Access the application:
@@ -230,10 +230,10 @@ npm test -- --coverage --watchAll=false
 
 ```bash
 # Backend tests in Docker
-docker-compose exec backend pytest test/ -v
+docker compose exec backend pytest test/ -v
 
-# Frontend tests in Docker (dev mode)
-docker-compose -f docker-compose.dev.yml exec frontend npm test
+# Frontend tests in Docker
+docker compose -f docker-compose.dev.yml exec frontend npm test
 ```
 
 ## 📚 Documentation
