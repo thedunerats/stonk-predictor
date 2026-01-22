@@ -1,0 +1,48 @@
+# Development Docker Compose with hot-reload
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: stonk-predictor-backend-dev
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./server:/app
+      - /app/__pycache__
+    command: python app.py
+    restart: unless-stopped
+    networks:
+      - stonk-network
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: stonk-predictor-frontend-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    command: npm start
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    networks:
+      - stonk-network
+
+networks:
+  stonk-network:
+    driver: bridge

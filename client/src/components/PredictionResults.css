@@ -1,0 +1,133 @@
+.prediction-results {
+  margin-top: 2rem;
+}
+
+.future-predictions {
+  margin-bottom: 2rem;
+}
+
+.future-predictions h3,
+.training-history h3,
+.model-info h3 {
+  color: #1e3c72;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.predictions-table {
+  overflow-x: auto;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.predictions-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.predictions-table th {
+  background: #1e3c72;
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.predictions-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.predictions-table tr:last-child td {
+  border-bottom: none;
+}
+
+.predictions-table tr:hover {
+  background: #e9ecef;
+}
+
+.predictions-table .positive {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.predictions-table .negative {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.training-history {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.model-info {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border-left: 3px solid #1e3c72;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 1.3rem;
+  color: #1e3c72;
+  font-weight: bold;
+}
+
+.download-button {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.download-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+@media (max-width: 768px) {
+  .predictions-table {
+    font-size: 0.9rem;
+  }
+
+  .predictions-table th,
+  .predictions-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
