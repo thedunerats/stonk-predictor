@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import App from '../App';
 import axios from 'axios';
@@ -111,7 +111,7 @@ describe('App Integration Tests', () => {
         loss: [0.1, 0.05, 0.01],
         valLoss: [0.12, 0.06, 0.02]
       },
-      accuracyStatus: 'good' as const,
+      accuracyStatus: 'good',
       accuracyMessage: 'Good accuracy!',
       modelInfo: {
         sequenceLength: 60,
