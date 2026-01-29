@@ -4,10 +4,238 @@ Complete guide for running the Stock Predictor application using Docker.
 
 ## Prerequisites
 
-- Docker Desktop (Windows/Mac) or Docker Engine (Linux)
+- Docker Engine (any OS) - see [Installation Guide](#docker-installation-without-docker-desktop) below
 - Docker Compose v2.0+
 - At least 4GB RAM available for containers
 - 5GB free disk space
+
+## Docker Installation (Without Docker Desktop)
+
+### Windows (WSL2)
+
+1. **Install WSL2**:
+```powershell
+# Run in PowerShell as Administrator
+wsl --install
+```
+
+2. **Install Ubuntu** (or your preferred distro):
+```powershell
+wsl --install -d Ubuntu
+```
+
+3. **Open Ubuntu terminal and install Docker Engine**:
+```bash
+# Update package index
+sudo apt-get update
+
+# Install dependencies
+sudo apt-get install -y ca-certificates curl gnupg lsb-release
+
+# Add Docker's official GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Set up repository
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker Engine
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Start Docker service
+sudo service docker start
+
+# Add your user to docker group (to avoid using sudo)
+sudo usermod -aG docker $USER
+
+# Apply group changes (logout/login or run)
+newgrp docker
+
+# Verify installation
+docker --version
+docker compose version
+```
+
+4. **Enable Docker on WSL startup** (optional):
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+echo 'if [ ! -S /var/run/docker.sock ]; then sudo service docker start; fi' >> ~/.bashrc
+source ~/.bashrc
+```
+
+5. **Access from Windows PowerShell** (optional):
+```bash
+# In WSL, expose Docker socket
+sudo chmod 666 /var/run/docker.sock
+```
+
+### macOS (Colima)
+
+Colima is a lightweight Docker runtime for macOS:
+
+```bash
+# Install Homebrew if not installed
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Colima and Docker CLI
+brew install colima docker docker-compose
+
+# Start Colima
+colima start --cpu 4 --memory 8 --disk 50
+
+# Verify installation
+docker --version
+docker compose version
+
+# Auto-start on login (optional)
+brew services start colima
+```
+
+**Colima commands**:
+```bash
+colima start          # Start Colima
+colima stop           # Stop Colima
+colima status         # Check status
+colima delete         # Remove Colima VM
+```
+
+### Linux (Native Docker Engine)
+
+#### Ubuntu/Debian
+
+```bash
+# Update package index
+sudo apt-get update
+
+# Install dependencies
+sudo apt-get install -y ca-certificates curl gnupg
+
+# Add Docker's GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add repository
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Enable Docker service
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# Add user to docker group
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Verify
+docker --version
+docker compose version
+```
+
+#### Fedora/RHEL/CentOS
+
+```bash
+# Install dependencies
+sudo dnf -y install dnf-plugins-core
+
+# Add Docker repository
+sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+
+# Install Docker
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Start Docker
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# Add user to docker group
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Verify
+docker --version
+docker compose version
+```
+
+#### Arch Linux
+
+```bash
+# Install Docker
+sudo pacman -S docker docker-compose
+
+# Enable and start Docker
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# Add user to docker group
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Verify
+docker --version
+docker compose version
+```
+
+### Verify Installation
+
+After installation, verify Docker is working:
+
+```bash
+# Check Docker version
+docker --version
+
+# Check Docker Compose version
+docker compose version
+
+# Run test container
+docker run hello-world
+
+# Check Docker info
+docker info
+```
+
+### Troubleshooting Installation
+
+**Docker daemon not running**:
+```bash
+# Linux
+sudo systemctl start docker
+
+# WSL2
+sudo service docker start
+
+# macOS (Colima)
+colima start
+```
+
+**Permission denied**:
+```bash
+# Add user to docker group
+sudo usermod -aG docker $USER
+
+# Logout and login, or run
+newgrp docker
+```
+
+**WSL2 not available**:
+```powershell
+# Enable WSL2 in PowerShell (Admin)
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
+# Restart computer, then set WSL2 as default
+wsl --set-default-version 2
+```
 
 ## Quick Start
 

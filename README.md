@@ -22,9 +22,11 @@ A full-stack web application that uses LSTM (Long Short-Term Memory) neural netw
 - npm or yarn
 
 ### Docker Installation (Recommended)
-- Docker Desktop (Windows/Mac) or Docker Engine (Linux)
+- Docker Engine (see installation guides below) or Docker Desktop
 - Docker Compose v2.0+
 - At least 4GB RAM available
+
+**Don't have Docker?** See [Docker Installation Guide](DOCKER.md#docker-installation-without-docker-desktop) for installing Docker Engine without Docker Desktop on Windows (WSL2), macOS (Colima), or Linux.
 
 ## 🛠️ Installation & Running
 
@@ -134,7 +136,7 @@ stonk-predictor/
 │   │   │   └── PredictionResults.tsx
 │   │   ├── types/
 │   │   │   └── index.ts        # TypeScript type definitions
-│   │   ├── __tests__/          # Unit tests
+│   │   ├── tests/          # Unit tests
 │   │   │   ├── App.test.tsx
 │   │   │   ├── ConfigPanel.test.tsx
 │   │   │   ├── MetricsDisplay.test.tsx

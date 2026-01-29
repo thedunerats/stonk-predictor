@@ -42,6 +42,27 @@
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.form-group input[type="date"] {
+  font-family: inherit;
+  color: #333;
+  cursor: pointer;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  margin-left: 4px;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  background-color: #f0f0f0;
 }
 
 .form-group input:focus,
@@ -81,6 +102,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+}
+
+.form-row .form-group {
+  min-width: 0;
+  margin-bottom: 1.5rem;
 }
 
 .divider {
