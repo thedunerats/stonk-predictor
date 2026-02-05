@@ -2,13 +2,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import type { Mock } from 'vitest';
 import App from '../App';
 import axios from 'axios';
 
 // Mock axios
 vi.mock('axios');
-const mockedAxios = axios as { post: Mock };
+const mockedAxios = vi.mocked(axios);
 
 describe('App Component', () => {
   beforeEach(() => {
