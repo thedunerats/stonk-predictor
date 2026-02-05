@@ -100,3 +100,9 @@ logs/
 *.temp
 tmp/
 temp/
+
+# Credentials (NEVER COMMIT)
+.wsl-credentials
+.credentials
+*.credentials
+secrets/

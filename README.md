@@ -34,7 +34,26 @@ A full-stack web application that uses LSTM (Long Short-Term Memory) neural netw
 
 **Quick start with Docker Compose:**
 
+**If using WSL2 on Windows:**
 ```bash
+# Open Ubuntu terminal (or run: wsl -d Ubuntu)
+cd /mnt/c/Git\ Repos/stonk-predictor
+
+# Start Docker service
+sudo service docker start
+
+# Production build
+sudo docker compose up -d
+
+# Development build (with hot-reload)
+sudo docker compose -f docker-compose.dev.yml up
+```
+
+**If using native Docker on Linux/macOS:**
+```bash
+# Navigate to project directory
+cd stonk-predictor
+
 # Production build
 docker compose up -d
 
@@ -93,6 +112,8 @@ npm install
 3. Start development server:
 ```bash
 npm start
+# or for development mode with hot-reload
+npm run dev
 ```
 
 Frontend runs on `http://localhost:3000`

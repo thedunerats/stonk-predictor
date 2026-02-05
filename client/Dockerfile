@@ -6,6 +6,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
+COPY vite.config.ts ./
+COPY index.html ./
 
 # Install dependencies
 RUN npm ci
@@ -14,7 +16,7 @@ RUN npm ci
 COPY public ./public
 COPY src ./src
 
-# Build the app
+# Build the app with Vite
 RUN npm run build
 
 # Production stage
