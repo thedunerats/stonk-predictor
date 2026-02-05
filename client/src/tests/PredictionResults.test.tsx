@@ -1,11 +1,12 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import PredictionResults from '../components/PredictionResults';
 import { FutureDataItem, TrainingHistory, ModelInfo } from '../types';
 
 // Mock Recharts
-jest.mock('recharts', () => ({
+vi.mock('recharts', () => ({
   LineChart: ({ children }: any) => <div data-testid="line-chart">{children}</div>,
   Line: () => <div data-testid="line" />,
   XAxis: () => <div data-testid="x-axis" />,
@@ -35,10 +36,10 @@ describe('PredictionResults Component', () => {
     testSamples: 250
   };
 
-  const mockOnDownload = jest.fn();
+  const mockOnDownload = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders future predictions title', () => {
