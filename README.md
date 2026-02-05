@@ -18,13 +18,15 @@ A full-stack web application that uses LSTM (Long Short-Term Memory) neural netw
 
 ### Standard Installation
 - Python 3.11 or higher
-- Node.js 18 or higher
+- Node.js 20 or higher
 - npm or yarn
 
 ### Docker Installation (Recommended)
-- Docker Desktop (Windows/Mac) or Docker Engine (Linux)
+- Docker Engine (see installation guides below) or Docker Desktop
 - Docker Compose v2.0+
 - At least 4GB RAM available
+
+**Don't have Docker?** See [Docker Installation Guide](DOCKER.md#docker-installation-without-docker-desktop) for installing Docker Engine without Docker Desktop on Windows (WSL2), macOS (Colima), or Linux.
 
 ## 🛠️ Installation & Running
 
@@ -32,7 +34,26 @@ A full-stack web application that uses LSTM (Long Short-Term Memory) neural netw
 
 **Quick start with Docker Compose:**
 
+**If using WSL2 on Windows:**
 ```bash
+# Open Ubuntu terminal (or run: wsl -d Ubuntu)
+cd /mnt/c/Git\ Repos/stonk-predictor
+
+# Start Docker service
+sudo service docker start
+
+# Production build
+sudo docker compose up -d
+
+# Development build (with hot-reload)
+sudo docker compose -f docker-compose.dev.yml up
+```
+
+**If using native Docker on Linux/macOS:**
+```bash
+# Navigate to project directory
+cd stonk-predictor
+
 # Production build
 docker compose up -d
 
@@ -91,6 +112,8 @@ npm install
 3. Start development server:
 ```bash
 npm start
+# or for development mode with hot-reload
+npm run dev
 ```
 
 Frontend runs on `http://localhost:3000`
@@ -134,7 +157,7 @@ stonk-predictor/
 │   │   │   └── PredictionResults.tsx
 │   │   ├── types/
 │   │   │   └── index.ts        # TypeScript type definitions
-│   │   ├── __tests__/          # Unit tests
+│   │   ├── tests/          # Unit tests
 │   │   │   ├── App.test.tsx
 │   │   │   ├── ConfigPanel.test.tsx
 │   │   │   ├── MetricsDisplay.test.tsx

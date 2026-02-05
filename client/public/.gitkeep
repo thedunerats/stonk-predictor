@@ -1,0 +1,2 @@
+# This file ensures the public directory is tracked by git
+# Place static assets here that should be served at the root level

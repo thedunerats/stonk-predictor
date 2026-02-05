@@ -1,16 +1,17 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import App from '../App';
 import axios from 'axios';
 
 // Mock axios
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+vi.mock('axios');
+const mockedAxios = vi.mocked(axios);
 
 describe('App Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders app header', () => {
@@ -54,7 +55,7 @@ describe('App Component', () => {
       dataPoints: 1500
     };
 
-    mockedAxios.post.mockResolvedValueOnce({ data: mockStockData });
+    vi.mocked(mockedAxios.post).mockResolvedValueOnce({ data: mockStockData } as any);
 
     render(<App />);
     
@@ -63,7 +64,7 @@ describe('App Component', () => {
   });
 
   test('handles error state', async () => {
-    mockedAxios.post.mockRejectedValueOnce({
+    vi.mocked(mockedAxios.post).mockRejectedValueOnce({
       response: { data: { error: 'API Error' } }
     });
 
@@ -121,9 +122,9 @@ describe('App Integration Tests', () => {
       }
     };
 
-    mockedAxios.post
-      .mockResolvedValueOnce({ data: mockStockData })
-      .mockResolvedValueOnce({ data: mockPredictionData });
+    vi.mocked(mockedAxios.post)
+      .mockResolvedValueOnce({ data: mockStockData } as any)
+      .mockResolvedValueOnce({ data: mockPredictionData } as any);
 
     render(<App />);
     

@@ -1,13 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import ConfigPanel from '../components/ConfigPanel';
 
 describe('ConfigPanel Component', () => {
-  const mockOnPredict = jest.fn();
+  const mockOnPredict = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders configuration panel', () => {

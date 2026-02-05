@@ -1,11 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import StockChart from '../components/StockChart';
 import { HistoricalDataWithPrediction, FutureDataItem } from '../types';
 
 // Mock Recharts to avoid rendering issues in tests
-jest.mock('recharts', () => ({
+vi.mock('recharts', () => ({
   LineChart: ({ children }: any) => <div data-testid="line-chart">{children}</div>,
   Line: () => <div data-testid="line" />,
   XAxis: () => <div data-testid="x-axis" />,

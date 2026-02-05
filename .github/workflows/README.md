@@ -9,7 +9,7 @@ This directory contains CI/CD workflows for the Stock Predictor project.
 
 Runs comprehensive unit tests for both backend and frontend:
 - **Backend**: Python tests with pytest on Python 3.11 and 3.12
-- **Frontend**: TypeScript/React tests with Jest on Node 18 and 20
+- **Frontend**: TypeScript/React tests with Vitest on Node 20 and 22
 - **Coverage**: Uploads coverage reports to Codecov
 - **Matrix**: Tests against multiple Python and Node versions
 
@@ -96,7 +96,7 @@ Workflows use caching to speed up runs:
 
 Tests run against multiple versions to ensure compatibility:
 - Python: 3.11, 3.12
-- Node.js: 18, 20
+- Node.js: 20, 22
 
 This catches version-specific issues early.
 
