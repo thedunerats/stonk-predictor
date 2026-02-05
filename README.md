@@ -18,7 +18,7 @@ A full-stack web application that uses LSTM (Long Short-Term Memory) neural netw
 
 ### Standard Installation
 - Python 3.11 or higher
-- Node.js 18 or higher
+- Node.js 20 or higher
 - npm or yarn
 
 ### Docker Installation (Recommended)

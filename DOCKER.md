@@ -283,7 +283,7 @@ Development URLs:
   - Volume mounts for development
 
 ### Frontend Container
-- **Base Image**: `node:18-alpine` (build) + `nginx:alpine` (serve)
+- **Base Image**: `node:20-alpine` (build) + `nginx:alpine` (serve)
 - **Port**: 80 (production) / 3000 (development)
 - **Framework**: React + TypeScript
 - **Features**:
