@@ -55,7 +55,7 @@ describe('App Component', () => {
       dataPoints: 1500
     };
 
-    mockedAxios.post.mockResolvedValueOnce({ data: mockStockData });
+    vi.mocked(mockedAxios.post).mockResolvedValueOnce({ data: mockStockData } as any);
 
     render(<App />);
     
@@ -64,7 +64,7 @@ describe('App Component', () => {
   });
 
   test('handles error state', async () => {
-    mockedAxios.post.mockRejectedValueOnce({
+    vi.mocked(mockedAxios.post).mockRejectedValueOnce({
       response: { data: { error: 'API Error' } }
     });
 
@@ -122,9 +122,9 @@ describe('App Integration Tests', () => {
       }
     };
 
-    mockedAxios.post
-      .mockResolvedValueOnce({ data: mockStockData })
-      .mockResolvedValueOnce({ data: mockPredictionData });
+    vi.mocked(mockedAxios.post)
+      .mockResolvedValueOnce({ data: mockStockData } as any)
+      .mockResolvedValueOnce({ data: mockPredictionData } as any);
 
     render(<App />);
     
